@@ -98,9 +98,9 @@ func (repo *projectQuery) SelectById(id, userIdLogin int) (*project.Core, error)
 }
 
 // Update implements project.ProjectDataInterface.
-func (repo *projectQuery) Update(id int, input project.Core) error {
+func (repo *projectQuery) Update(userIdLogin int, id int, input project.Core) error {
 	dataGorm := CoreToModel(input)
-	tx := repo.db.Model(&Project{}).Where("id = ?", id).Updates(dataGorm)
+	tx := repo.db.Model(&Project{}).Where("id = ? AND user_id = ?", id, userIdLogin).Updates(dataGorm)
 	if tx.Error != nil {
 		return tx.Error
 	}
@@ -112,9 +112,9 @@ func (repo *projectQuery) Update(id int, input project.Core) error {
 }
 
 // Delete implements project.ProjectDataInterface.
-func (repo *projectQuery) Delete(id int) error {
+func (repo *projectQuery) Delete(id, userIdLogin int) error {
 	// Hapus project dari database
-	tx := repo.db.Delete(&Project{}, id)
+	tx := repo.db.Where("id = ? AND user_id = ?", id, userIdLogin).Delete(&Project{})
 	if tx.Error != nil {
 		return tx.Error
 	}

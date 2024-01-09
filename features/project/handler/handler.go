@@ -76,6 +76,9 @@ func (handler *ProjectHandler) CreateProject(c echo.Context) error {
 }
 
 func (handler *ProjectHandler) UpdateProject(c echo.Context) error {
+	//mengambil informasi id user yang dikirim pada token payload
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+
 	id := c.Param("project_id")
 	idParam, errConv := strconv.Atoi(id)
 	if errConv != nil {
@@ -89,23 +92,26 @@ func (handler *ProjectHandler) UpdateProject(c echo.Context) error {
 	}
 
 	projectCore := RequestToCoreUpdate(projectData)
-	errUpdate := handler.projectService.Update(idParam, projectCore)
+	errUpdate := handler.projectService.Update(userIdLogin, idParam, projectCore)
 	if errUpdate != nil {
-		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error update data"+errUpdate.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error update data "+errUpdate.Error(), nil))
 	}
 
 	return c.JSON(http.StatusOK, responses.WebResponse("success update data", nil))
 }
 
 func (handler *ProjectHandler) DeleteProject(c echo.Context) error {
+	//mengambil informasi id user yang dikirim pada token payload
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+
 	id, err := strconv.Atoi(c.Param("project_id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.WebResponse("error. id should be number", nil))
 	}
 
-	errDelete := handler.projectService.Delete(id)
+	errDelete := handler.projectService.Delete(id, userIdLogin)
 	if errDelete != nil {
-		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error delete data"+errDelete.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error delete data "+errDelete.Error(), nil))
 	}
 
 	return c.JSON(http.StatusOK, responses.WebResponse("success delete data", nil))

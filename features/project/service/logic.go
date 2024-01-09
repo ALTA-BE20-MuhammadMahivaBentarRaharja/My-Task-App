@@ -43,21 +43,21 @@ func (service *projectService) GetById(id, userIdLogin int) (*project.Core, erro
 }
 
 // Update implements project.ProjectServiceInterface.
-func (service *projectService) Update(id int, input project.Core) error {
+func (service *projectService) Update(userIdLogin int, id int, input project.Core) error {
 	//validasi
 	if id <= 0 {
 		return errors.New("invalid id")
 	}
-	err := service.projectData.Update(id, input)
+	err := service.projectData.Update(userIdLogin, id, input)
 	return err
 }
 
 // Delete implements project.ProjectServiceInterface.
-func (service *projectService) Delete(id int) error {
+func (service *projectService) Delete(id, userIdLogin int) error {
 	//validasi
 	if id <= 0 {
 		return errors.New("invalid id")
 	}
-	err := service.projectData.Delete(id)
+	err := service.projectData.Delete(id, userIdLogin)
 	return err
 }

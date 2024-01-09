@@ -9,10 +9,10 @@ import (
 // struct task gorm model
 type Task struct {
 	gorm.Model
-	Name        string `json:"name" form:"name"`
-	ProjectID   uint   `json:"project_id" form:"project_id"`
-	Description string `json:"description" form:"description"`
-	StatusTask  string `json:"status_task" form:"status_task"`
+	Name        string
+	ProjectID   uint
+	Description string
+	StatusTask  string
 }
 
 func CoreToModel(input task.Core) Task {

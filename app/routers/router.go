@@ -27,7 +27,7 @@ func InitRouter(db *gorm.DB, e *echo.Echo) {
 	projectHandlerAPI := _projectHandler.New(projectService)
 
 	taskData := _taskData.New(db)
-	taskService := _taskService.New(taskData)
+	taskService := _taskService.New(taskData, projectService)
 	taskHandlerAPI := _taskHandler.New(taskService)
 	// define routes/ endpoint
 	e.POST("/login", userHandlerAPI.Login)

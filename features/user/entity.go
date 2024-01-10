@@ -17,17 +17,17 @@ type Core struct {
 // interface untuk Data Layer
 type UserDataInterface interface {
 	Insert(input Core) error
-	SelectById(id int) (*Core, error)
-	Update(id int, input Core) error
-	Delete(id int) error
+	SelectById(userIdLogin int) (*Core, error)
+	Update(userIdLogin int, input Core) error
+	Delete(userIdLogin int) error
 	Login(email, password string) (data *Core, err error)
 }
 
 // interface untuk Service Layer
 type UserServiceInterface interface {
 	Create(input Core) error
-	GetById(id int) (*Core, error)
-	Update(id int, input Core) error
-	Delete(id int) error
+	GetById(userIdLogin int) (*Core, error)
+	Update(userIdLogin int, input Core) error
+	Delete(userIdLogin int) error
 	Login(email, password string) (data *Core, token string, err error)
 }

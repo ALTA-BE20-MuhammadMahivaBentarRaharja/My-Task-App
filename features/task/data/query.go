@@ -37,6 +37,28 @@ func (repo *taskQuery) Insert(input task.Core) error {
 	return nil
 }
 
+// SelectById implements task.TaskDataInterface.
+func (repo *taskQuery) SelectById(id int) (*task.Core, error) {
+	// Dapatkan data task berdasarkan id dari database
+	var taskDataGorm Task
+	tx := repo.db.First(&taskDataGorm, id)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// proses mapping dari struct gorm model ke struct core
+	var taskDataCore = task.Core{
+		ID:          taskDataGorm.ID,
+		Name:        taskDataGorm.Name,
+		ProjectID:   taskDataGorm.ProjectID,
+		Description: taskDataGorm.Description,
+		CreatedAt:   taskDataGorm.CreatedAt,
+		UpdatedAt:   taskDataGorm.UpdatedAt,
+		StatusTask:  taskDataGorm.StatusTask,
+	}
+	return &taskDataCore, nil
+}
+
 // Update implements task.TaskDataInterface.
 func (repo *taskQuery) Update(id int, input task.Core) error {
 	dataGorm := CoreToModel(input)

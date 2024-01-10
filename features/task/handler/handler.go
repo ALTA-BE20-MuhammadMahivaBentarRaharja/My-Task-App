@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"my-task-app/app/middlewares"
 	"my-task-app/features/task"
 	"my-task-app/utils/responses"
 	"net/http"
@@ -20,6 +21,9 @@ func New(service task.TaskServiceInterface) *TaskHandler {
 }
 
 func (handler *TaskHandler) CreateTask(c echo.Context) error {
+	//mengambil informasi id user yang dikirim pada token payload
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+
 	newTask := TaskRequest{}
 	errBind := c.Bind(&newTask) // mendapatkan data yang dikirim oleh FE melalui request body
 	if errBind != nil {
@@ -28,15 +32,18 @@ func (handler *TaskHandler) CreateTask(c echo.Context) error {
 
 	//mapping dari request ke core
 	taskCore := RequestToCore(newTask)
-	errInsert := handler.taskService.Create(taskCore)
+	errInsert := handler.taskService.Create(taskCore, userIdLogin)
 	if errInsert != nil {
-		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error insert data"+errInsert.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error insert data "+errInsert.Error(), nil))
 	}
 
 	return c.JSON(http.StatusOK, responses.WebResponse("success insert data", nil))
 }
 
 func (handler *TaskHandler) UpdateTask(c echo.Context) error {
+	//mengambil informasi id user yang dikirim pada token payload
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+
 	id := c.Param("task_id")
 	idParam, errConv := strconv.Atoi(id)
 	if errConv != nil {
@@ -50,7 +57,7 @@ func (handler *TaskHandler) UpdateTask(c echo.Context) error {
 	}
 
 	taskCore := RequestToCore(taskData)
-	errUpdate := handler.taskService.Update(idParam, taskCore)
+	errUpdate := handler.taskService.Update(idParam, taskCore, userIdLogin)
 	if errUpdate != nil {
 		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error update data"+errUpdate.Error(), nil))
 	}
@@ -59,14 +66,17 @@ func (handler *TaskHandler) UpdateTask(c echo.Context) error {
 }
 
 func (handler *TaskHandler) DeleteTask(c echo.Context) error {
+	//mengambil informasi id user yang dikirim pada token payload
+	userIdLogin := middlewares.ExtractTokenUserId(c)
+
 	id, err := strconv.Atoi(c.Param("task_id"))
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, responses.WebResponse("error. id should be number", nil))
 	}
 
-	errDelete := handler.taskService.Delete(id)
+	errDelete := handler.taskService.Delete(id, userIdLogin)
 	if errDelete != nil {
-		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error delete data"+errDelete.Error(), nil))
+		return c.JSON(http.StatusInternalServerError, responses.WebResponse("error delete data "+errDelete.Error(), nil))
 	}
 
 	return c.JSON(http.StatusOK, responses.WebResponse("success delete data", nil))

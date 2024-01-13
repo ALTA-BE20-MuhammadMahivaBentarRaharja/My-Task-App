@@ -30,6 +30,7 @@ func CreateToken(userId int) (string, error) {
 
 // extract token jwt
 func ExtractTokenUserId(e echo.Context) int {
+	//cara yang disediakan echo
 	user := e.Get("user").(*jwt.Token)
 	if user.Valid {
 		claims := user.Claims.(jwt.MapClaims)
@@ -38,4 +39,22 @@ func ExtractTokenUserId(e echo.Context) int {
 		return int(userId)
 	}
 	return 0
+
+	// cara manual
+	// header := e.Request().Header.Get("Authorization")
+	// headerToken := strings.Split(header, " ")
+	// token := headerToken[len(headerToken)-1]
+	// tokenJWT, _ := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+	// 	return []byte(configs.JWT_SECRET), nil
+	// })
+
+	// if tokenJWT.Valid {
+	// 	claims := tokenJWT.Claims.(jwt.MapClaims)
+	// 	userId, isValidUserId := claims["userId"].(float64)
+	// 	if !isValidUserId {
+	// 		return 0
+	// 	}
+	// 	return int(userId)
+	// }
+	// return 0
 }

@@ -5,24 +5,45 @@ import (
 	"log"
 	"my-task-app/app/middlewares"
 	"my-task-app/features/user"
+	"my-task-app/utils/encrypts"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type userService struct {
-	userData user.UserDataInterface
+	userData    user.UserDataInterface
+	hashService encrypts.HashInterface
+	validate    *validator.Validate
 }
 
 // dependency injection
-func New(repo user.UserDataInterface) user.UserServiceInterface {
+func New(repo user.UserDataInterface, hash encrypts.HashInterface) user.UserServiceInterface {
 	return &userService{
-		userData: repo,
+		userData:    repo,
+		hashService: hash,
+		validate:    validator.New(),
 	}
 }
 
 // Create implements user.UserServiceInterface.
 func (service *userService) Create(input user.Core) error {
 	// logic validation
-	if input.Email == "" {
-		return errors.New("[validation] email harus diisi")
+	// validasi email manual
+	// if input.Email == "" {
+	// 	return errors.New("[validation] email harus diisi")
+	// }
+	// validasi email dengan menggunakan library validator
+	errValidate := service.validate.Struct(input)
+	if errValidate != nil {
+		return errValidate
+	}
+
+	if input.Password != "" {
+		hashedPass, errHash := service.hashService.HashPassword(input.Password)
+		if errHash != nil {
+			return errors.New("Error hash password.")
+		}
+		input.Password = hashedPass
 	}
 	err := service.userData.Insert(input)
 	return err
@@ -65,6 +86,10 @@ func (service *userService) Login(email string, password string) (data *user.Cor
 	data, err = service.userData.Login(email, password)
 	if err != nil {
 		return nil, "", err
+	}
+	isValid := service.hashService.CheckPasswordHash(data.Password, password)
+	if !isValid {
+		return nil, "", errors.New("password tidak sesuai.")
 	}
 	log.Println("id user:", data.ID)
 	token, errJwt := middlewares.CreateToken(int(data.ID))

@@ -11,6 +11,7 @@ import (
 	_userData "my-task-app/features/user/data"
 	_userHandler "my-task-app/features/user/handler"
 	_userService "my-task-app/features/user/service"
+	"my-task-app/utils/encrypts"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -18,8 +19,9 @@ import (
 
 func InitRouter(db *gorm.DB, e *echo.Echo) {
 
+	hashService := encrypts.NewHashService()
 	userData := _userData.New(db)
-	userService := _userService.New(userData)
+	userService := _userService.New(userData, hashService)
 	userHandlerAPI := _userHandler.New(userService)
 
 	projectData := _projectData.New(db)

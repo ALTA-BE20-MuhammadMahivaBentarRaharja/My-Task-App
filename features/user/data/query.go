@@ -96,7 +96,7 @@ func (repo *userQuery) Delete(userIdLogin int) error {
 // Login implements user.UserDataInterface.
 func (repo *userQuery) Login(email string, password string) (data *user.Core, err error) {
 	var userGorm User
-	tx := repo.db.Where("email = ? and password = ?", email, password).First(&userGorm)
+	tx := repo.db.Where("email = ?", email).First(&userGorm)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

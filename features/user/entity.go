@@ -5,7 +5,7 @@ import "time"
 type Core struct {
 	ID          uint
 	Name        string
-	Email       string
+	Email       string `validate:"required,email"`
 	Password    string
 	Address     string
 	PhoneNumber string

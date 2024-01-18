@@ -58,6 +58,26 @@ func (service *projectService) Delete(id, userIdLogin int) error {
 	if id <= 0 {
 		return errors.New("invalid id")
 	}
+
+	_, errSelect := service.projectData.SelectById(id, userIdLogin)
+	if errSelect != nil {
+		return errSelect
+	}
+
+	// Fetch tasks associated with the project
+	tasks, errGet := service.projectData.SelectAllTasksByProjectId(id)
+	if errGet != nil {
+		return errGet
+	}
+
+	// Delete each task associated with the project
+	for _, task := range tasks {
+		errDel := service.projectData.DeleteTask(int(task.ID))
+		if errDel != nil {
+			return errDel
+		}
+	}
+
 	err := service.projectData.Delete(id, userIdLogin)
 	return err
 }

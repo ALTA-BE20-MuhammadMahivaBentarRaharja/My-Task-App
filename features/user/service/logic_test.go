@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestGetById(t *testing.T) {
@@ -28,7 +27,7 @@ func TestGetById(t *testing.T) {
 
 	t.Run("Success Get By Id", func(t *testing.T) {
 		// mock return suatu func dari data layer
-		repo.On("SelectById", mock.Anything).Return(&returnData, nil).Once()
+		repo.On("SelectById", 1).Return(&returnData, nil).Once()
 		//create object service
 		srv := New(repo, hash)
 		//return dari service layer

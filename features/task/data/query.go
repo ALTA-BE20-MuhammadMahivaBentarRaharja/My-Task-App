@@ -37,6 +37,31 @@ func (repo *taskQuery) Insert(input task.Core) error {
 	return nil
 }
 
+func (repo *taskQuery) SelectAllTasksByProjectId(projectId, userIdLogin int) ([]task.Core, error) {
+	var tasksDataGorm []Task
+	tx := repo.db.Where("project_id = ? AND user_id = ?", projectId, userIdLogin).Find(&tasksDataGorm)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+
+	// proses mapping dari struct gorm model ke struct core
+	var tasksDataCore []task.Core
+	for _, value := range tasksDataGorm {
+		var taskCore = task.Core{
+			ID:          value.ID,
+			Name:        value.Name,
+			ProjectID:   value.ProjectID,
+			Description: value.Description,
+			CreatedAt:   value.CreatedAt,
+			UpdatedAt:   value.UpdatedAt,
+			StatusTask:  value.StatusTask,
+		}
+		tasksDataCore = append(tasksDataCore, taskCore)
+	}
+
+	return tasksDataCore, nil
+}
+
 // SelectById implements task.TaskDataInterface.
 func (repo *taskQuery) SelectById(id int) (*task.Core, error) {
 	// Dapatkan data task berdasarkan id dari database

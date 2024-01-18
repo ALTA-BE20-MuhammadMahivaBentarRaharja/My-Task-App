@@ -44,6 +44,13 @@ func (service *taskService) Create(input task.Core, userIdLogin int) error {
 	return err
 }
 
+// GetAll implements task.TaskServiceInterface.
+func (service *taskService) GetAllTasksByProjectId(projectId, userIdLogin int) ([]task.Core, error) {
+	// memanggil func yg ada di data layer
+	results, err := service.taskData.SelectAllTasksByProjectId(projectId, userIdLogin)
+	return results, err
+}
+
 // Update implements task.TaskServiceInterface.
 func (service *taskService) Update(id int, input task.Core, userIdLogin int) error {
 	//validasi

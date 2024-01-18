@@ -3,16 +3,19 @@ package service
 import (
 	"errors"
 	"my-task-app/features/project"
+	"my-task-app/features/task"
 )
 
 type projectService struct {
 	projectData project.ProjectDataInterface
+	taskService task.TaskServiceInterface
 }
 
 // dependency injection
-func New(repo project.ProjectDataInterface) project.ProjectServiceInterface {
+func New(repo project.ProjectDataInterface, task task.TaskServiceInterface) project.ProjectServiceInterface {
 	return &projectService{
 		projectData: repo,
+		taskService: task,
 	}
 }
 
@@ -58,6 +61,22 @@ func (service *projectService) Delete(id, userIdLogin int) error {
 	if id <= 0 {
 		return errors.New("invalid id")
 	}
+
+	// Fetch tasks associated with the project
+	tasks, errGet := service.taskService.GetAllTasksByProjectId(id, userIdLogin)
+	if errGet != nil {
+		return errGet
+	}
+
+	// Delete each task associated with the project
+	for _, task := range tasks {
+		errDel := service.taskService.Delete(int(task.ID), userIdLogin)
+		if errDel != nil {
+			// Handle error, you might choose to continue or abort based on your requirements
+			return errDel
+		}
+	}
+
 	err := service.projectData.Delete(id, userIdLogin)
 	return err
 }

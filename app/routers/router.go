@@ -25,7 +25,7 @@ func InitRouter(db *gorm.DB, e *echo.Echo) {
 	userHandlerAPI := _userHandler.New(userService)
 
 	projectData := _projectData.New(db)
-	projectService := _projectService.New(projectData)
+	projectService := _projectService.New(projectData, taskService)
 	projectHandlerAPI := _projectHandler.New(projectService)
 
 	taskData := _taskData.New(db)

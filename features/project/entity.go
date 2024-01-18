@@ -22,8 +22,10 @@ type ProjectDataInterface interface {
 	Insert(input Core) error
 	SelectAll(userIdLogin int) ([]Core, error)
 	SelectById(id, userIdLogin int) (*Core, error)
+	SelectAllTasksByProjectId(projectId int) ([]task.Core, error)
 	Update(userIdLogin int, id int, input Core) error
 	Delete(id int, userIdLogin int) error
+	DeleteTask(id int) error
 }
 
 // interface untuk Service Layer
